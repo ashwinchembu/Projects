@@ -1,0 +1,135 @@
+README for RoboGrader
+
+C. Seshadhri, Sept 2017, Jan 2018
+==================================
+
+Source files: robograder.py, utilities.py, checker.py 
+Other files: rubric files Rubric/<ASSN>-rubric.txt and (possibly) spec files Spec/<ASSN>-spec.txt 
+
+Look at TESTS for a collection of test cases.
+
+==================================
+
+The basic setup
+-------------------------------
+
+The idea of RoboGrader is to perform automated testing and scoring for programming assignments.
+
+We require the following setup for the solution of the programming assignment (as designed by a student).
+    - There is some folder (which can be anywhere) containing the student's solutions.
+    - In that folder, there are folders labeled <ASSN NAME>, such as HW1, HW2, Lab1, Lab2, etc. 
+    Each of these subfolders contain the code for that assignment.
+    - The code can be in any language, but we assume the existence of some command that creates
+    an executable. Furthermore, this executable will take two command line arguments: an input file
+    (containing some input/test to process) and an output file (which is created by the executable,
+    and will contain the output/solution).
+
+The instructor would need a grading setup as follows.
+    - She has created a series of test input files (say input1.txt, input2.txt, etc.), to be run
+    in that order.
+    - If the student's solution correctly processes an input test file, the student receives some points.
+    If the student's solution fails any input test file, the grading terminates. (Thus, the student
+    does not receive any points for subsequent test files.)
+    - To determine correctness of output, there are two options.
+        * Equality check: for each input file, the instructor provides the "ideal" or correct output file.
+        Correctness of the solution is simply determined by whether the student's output matches this output
+        (up to whitespace)
+        * Explicit verifier: for more complex setups, we could imagine that the output is not unique.
+        The instructor has to write a "verifier" program that takes the student's output (and possibly
+        a correct output) and determines correctness.
+
+The instructor will set all of this up through a Rubric file, that we explain shortly.
+
+When robograder processes a student's solution, it will produce a log file in the solution folder.
+This log file gives a list of tests that pass and gives the final score.
+Importantly, if the student's solution failed some test, robograder will put that test file
+in the student's folder, along with the student's incorrect solution, and give the correct solution.
+These details are given in the log file, so the student can run his solution on that failed test.
+
+===============================
+
+Instruction to run robograder
+-------------------------------
+
+Run "python3 robograder.py <OPTIONS> <ASSN NAME> <PATH TO FOLDER>", 
+
+where <ASSN NAME> is HW1, Lab1, HW2, etc, in folder <PATH TO FOLDER>.
+Note that each <ASSN NAME> is a subfolder. 
+
+The options are:
+    -c: Option to run checker (as given by checker.py) beforehand
+    -l: run inputs line by line. In some assignments, each line of test file may represent a new output, so we may want
+    to perform a separate run for each line. If the student's solution fails, then robograder will report the specific
+    line that failed (instead of the entire file).
+    -t: Must be followed by integer. This is setting the timeout threshold for any run. The default value is 60 seconds.
+    -e: Equality check. This simply performs an equality check with the student's output with the ideal output file.
+
+For example:
+    python3 robograder.py -c -e -l -t 180 HW2 <PATH TO FOLDER>
+
+More on -c option:
+    It's a good idea to set up the checker for <ASSN> and always run it before the grader (thus, use the -c option).
+    This does some basic sanity checks on the code that the student should perform, and makes sure that the student
+    went through the trouble of naming files correctly, producing executables, etc.
+    Note that if the checker is performing some test cases, those test cases and corresponding ideal/correct outputs
+    must be the student's solution folder. Otherwise, the checker will fail.
+
+
+-------------------------------
+Setting up rubrics:
+
+The rubric file for <ASSN> is <ASSN>-rubric.txt, and should be in folder Rubric/
+This is how the instructor customizes robograder for <ASSN>.
+
+Any line in this file starting with # is ignored as a comment.
+Each line starts with some indicator (such as s, v, t, etc.) succeeded by a number for linking.
+The following explains what each line means. Below, x denotes a nonnegative number.
+
+sx: scores
+vx: verifiers
+ex: executables
+cx: commands producing executables
+px: commands producing outputs
+tx: test input files
+ix: ideal output files
+mx: messages
+
+These are all coupled through the same choice of x.
+Thus, s1, v1, e1, c1, etc. are coupled.
+The setting of x=0 is special, in that it forms default
+values for entire grading process (for this <ASSN>).
+
+robograder will iterate through all values of x > 0, and perform the following operations. (If cx, ex, etc. are not specified, then
+robograder uses c0, e0, etc.)
+    
+    - Run command "cx". This takes the students sources to produce executable.
+    - Check that corresponding executable "ex" is created.
+    - Run command "px" with command line inputs of "tx" and a default named output file. This should produce the student's output file for the input "tx"
+    - If the option "-e" (equality check) was given, then simply check if output file makes the correct output "ix". Otherwise, use the 
+    verifier command "vx" to perform verification (more on that later).
+    - If the test passes, add "sx" to the student's score. Also,
+    put the message "mx" in the student's log file, informing the student about the kinds of tests that the solution passed.
+
+For most assignments, c0, e0, p0, v0 are set to defaults, while the 
+test input/output files tx, ix vary.
+
+s0: This is a baseline score, which is 0 if not specified.
+Typically, if one runs with -c flag,
+the grader first runs the checker to verify that the student was able to clear the basic checks. We may
+wish to give the student some non-zero score for simply passing the checker. This is achieved by setting the baseline.
+
+-------------------------------
+Coding verifiers:
+
+For assignments where solutions are not unique, one requires an assignment-specific verification code.
+
+The verification code must be a command that takes three command
+line parameters: the students output file, the test file, an ideal/correct output file.
+
+The verification code must output a file "verifier.log", where the last line is either 'PASS\n' or 'FAIL\n'.
+
+====================================================
+
+A number of real examples are given in Rubric/ with
+corresponding solutions in Test/
+

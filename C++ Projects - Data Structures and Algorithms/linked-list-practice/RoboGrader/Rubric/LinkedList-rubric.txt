@@ -1,0 +1,17 @@
+# Rubric file for reverse question in LinkedList tests of CSE101, WInter 2020
+#
+#################
+s0: 0
+c0: make
+e0: listwrapper
+p0: ./listwrapper
+#################
+s1: 5
+t1: Tests/simple-input-reverse.txt
+i1: Tests/simple-output-reverse.txt
+m1: Simple input passes
+#################
+s2: 5
+t2: Tests/large-input-reverse.txt
+i2: Tests/large-output-reverse.txt
+m2: Large input passes

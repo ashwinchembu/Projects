@@ -1,0 +1,34 @@
+README for the robograder tool
+
+C. Seshadhri, Jan 2018
+==========================================
+
+This folder contains the robograder tool and a collection of actual assignments graded through it.
+
+Source files: robochecker.py, robograder.py, utilities.py
+There are separate README files for robochecker and robograder, that explains its function and setup.
+
+TEST: This is file with a number of robograder commands to grading the Test solutions.
+
+Assn/: This contains the assignment descriptions for the test solutions.
+Test/: Contains solutions for these assignments. Imagine this to be the folder of a student, that contains solutions for various assignments.
+
+Rubric/: Rubric files for robograder
+Spec/: Spec files for robochecker
+Verifiers/: Verifier codes for robograder
+
+==========================================
+
+robochecker: This is lightweight tool meant to be given to students. This verifies that the students name their files
+    correctly, have included all their sources, etc. It can also run some test cases.
+
+robograder: This is the automated grading tool that takes a rubric and produces a score. 
+
+More details about both in their respective READMEs
+
+==========================================
+
+CAVEAT: This tool is not secure, since it runs a students solution on your machine directly (through python's subprocess module).
+Thus, it is running untrusted code without sandboxing, so you should be careful.
+
+

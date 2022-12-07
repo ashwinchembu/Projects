@@ -1,0 +1,26 @@
+CXX = g++
+CXXFLAGS = -Wall
+
+
+treewrapper: bst.o treewrapper.o
+	$(CXX) -g $(CXXFLAGS) -o treewrapper bst.o treewrapper.o
+
+bst.o: bst.cpp bst.h
+	$(CXX) -g $(CXXFLAGS) -c bst.cpp
+	
+treewrapper.o: bst.cpp bst.h treewrapper.cpp
+	$(CXX) -g $(CXXFLAGS) -c treewrapper.cpp
+
+avlwrapper: avl.o avlwrapper.o
+	$(CXX) -g $(CXXFLAGS) -o avlwrapper avl.o avlwrapper.o
+
+avl.o: avl.cpp avl.h
+	$(CXX) -g $(CXXFLAGS) -c avl.cpp
+
+avlwrapper.o: avl.cpp avl.h avlwrapper.cpp
+	$(CXX) -g $(CXXFLAGS) -c avlwrapper.cpp
+
+clean: 
+	rm -f *.o
+	rm treewrapper
+	rm avlwrapper
